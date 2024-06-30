@@ -11,6 +11,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -66,7 +67,8 @@ fun InventoryListScreen(
                 ) {
                     Text(
                         "You have no inventories at the moment, start by clicking the add button",
-                        Modifier.align(Alignment.Center).padding(24.dp)
+                        Modifier.align(Alignment.Center).padding(24.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             } else {

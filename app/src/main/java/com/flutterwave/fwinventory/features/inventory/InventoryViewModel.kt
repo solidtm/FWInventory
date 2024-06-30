@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.flutterwave.fwinventory.data.db.InventoryDao
 import com.flutterwave.fwinventory.data.model.InventoryItem
 import com.flutterwave.fwinventory.domain.AuthRepository
+import com.flutterwave.fwinventory.domain.InventoryRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -12,7 +13,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InventoryViewModel @Inject constructor(
-    private val inventoryDao: InventoryDao,
+    private val inventoryRepository: InventoryRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -22,37 +23,40 @@ class InventoryViewModel @Inject constructor(
     init {
         val userId = authRepository.getCurrentUserId()
         println(userId)
-        if (userId != null) {
-            viewModelScope.launch {
-                inventoryDao.getItems(userId)
-                    .onEach { items ->
-                        _inventoryItems.value = items
-                    }
-                    .launchIn(this)
-            }
+        viewModelScope.launch {
+            inventoryRepository.getItems(userId)
+                .onEach { items ->
+                    _inventoryItems.value = items
+                }
+                .launchIn(this)
         }
     }
 
     fun addItem(item: InventoryItem) {
         viewModelScope.launch {
-            inventoryDao.insertItem(item)
+            inventoryRepository.insertItem(item)
         }
     }
 
     fun updateItem(item: InventoryItem) {
         viewModelScope.launch {
-            inventoryDao.updateItem(item)
+            inventoryRepository.updateItem(item)
         }
     }
 
     fun deleteItem(item: InventoryItem) {
         viewModelScope.launch {
-            inventoryDao.deleteItem(item)
+            inventoryRepository.deleteItem(item)
         }
     }
 
+
     suspend fun getItem(id: Int): InventoryItem? {
         val userId = authRepository.getCurrentUserId() ?: return null
-        return inventoryDao.getItem(id, userId)
+        return inventoryRepository.getItem(id, userId)
+    }
+
+    suspend fun isNameDuplicate(name: String): Boolean {
+        return inventoryRepository.isNameDuplicate(name)
     }
 }

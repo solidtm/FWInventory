@@ -14,6 +14,9 @@ interface InventoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(item: InventoryItem)
 
+    @Query("SELECT COUNT(*) FROM Inventories WHERE name = :name")
+    suspend fun countItemsWithName(name: String): Int
+
     @Update
     suspend fun updateItem(item: InventoryItem)
 

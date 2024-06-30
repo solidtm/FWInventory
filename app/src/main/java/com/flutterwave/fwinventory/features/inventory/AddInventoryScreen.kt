@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.flutterwave.fwinventory.data.model.InventoryItem
 import com.flutterwave.fwinventory.features.login.AuthViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +25,13 @@ fun AddInventoryScreen(
     var totalStock by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var totalStockError by remember { mutableStateOf<String?>(null) }
+    var priceError by remember { mutableStateOf<String?>(null) }
+    var descriptionError by remember { mutableStateOf<String?>(null) }
+
+    val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -39,46 +47,108 @@ fun AddInventoryScreen(
             ) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = { name = it; nameError = null },
                     label = { Text("Item Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = nameError != null
                 )
+                if (nameError != null) {
+                    Text(
+                        text = nameError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = totalStock,
-                    onValueChange = { totalStock = it },
+                    onValueChange = { totalStock = it; totalStockError = null },
                     label = { Text("Total Stock") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = totalStockError != null
                 )
+                if (totalStockError != null) {
+                    Text(
+                        text = totalStockError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = price,
-                    onValueChange = { price = it },
+                    onValueChange = { price = it; priceError = null },
                     label = { Text("Price") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = priceError != null
                 )
+                if (priceError != null) {
+                    Text(
+                        text = priceError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = { description = it; descriptionError = null },
                     label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = descriptionError != null
                 )
+                if (descriptionError != null) {
+                    Text(
+                        text = descriptionError!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        viewModel.addItem(
-                            InventoryItem(
-                                userId = authViewModel.getCurrentUserId(),
-                                name = name,
-                                totalStock = totalStock.toIntOrNull() ?: 0,
-                                price = price.toDoubleOrNull() ?: 0.0,
-                                description = description
-                            )
-                        )
-                        navController.popBackStack()
+                        coroutineScope.launch {
+                            var hasError = false
+                            if (name.isBlank()) {
+                                nameError = "Name is required"
+                                hasError = true
+                            } else if (viewModel.isNameDuplicate(name)) {
+                                nameError = "Name must be unique"
+                                hasError = true
+                            }
+
+                            val totalStockInt = totalStock.toIntOrNull()
+                            if (totalStock.isBlank() || totalStockInt == null) {
+                                totalStockError = "Total stock is required and must be a number"
+                                hasError = true
+                            }
+
+                            val priceDouble = price.toDoubleOrNull()
+                            if (price.isBlank() || priceDouble == null) {
+                                priceError = "Price is required and must be a number"
+                                hasError = true
+                            }
+
+                            if (description.isBlank() || description.split(" ").size < 3) {
+                                descriptionError = "Description is required and must have at least three words"
+                                hasError = true
+                            }
+
+                            if (!hasError) {
+                                viewModel.addItem(
+                                    InventoryItem(
+                                        userId = authViewModel.getCurrentUserId(),
+                                        name = name,
+                                        totalStock = totalStockInt!!,
+                                        price = priceDouble!!,
+                                        description = description
+                                    )
+                                )
+                                navController.popBackStack()
+                            }
+                        }
                     },
                     modifier = Modifier.align(Alignment.End)
                 ) {
@@ -88,3 +158,5 @@ fun AddInventoryScreen(
         }
     )
 }
+
+
