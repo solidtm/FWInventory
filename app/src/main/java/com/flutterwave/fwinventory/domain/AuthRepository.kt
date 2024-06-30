@@ -7,9 +7,9 @@ import javax.inject.Inject
 class AuthRepository @Inject constructor(private val sharedPreferences: SharedPreferences) {
 
     fun login(email: String) {
-        val userId = UUID.randomUUID().toString()  // Generate unique user ID
+        val userId = email.hashCode()  // Generate unique user ID
         sharedPreferences.edit().putString("email", email).apply()
-        sharedPreferences.edit().putString("user_id", userId).apply() // Save user ID
+        sharedPreferences.edit().putInt("user_id", userId).apply() // Save user ID
     }
 
     fun isLoggedIn(): Boolean {
@@ -21,7 +21,7 @@ class AuthRepository @Inject constructor(private val sharedPreferences: SharedPr
         sharedPreferences.edit().remove("user_id").apply()
     }
 
-    fun getCurrentUserId(): String? {
-        return sharedPreferences.getString("user_id", null)
+    fun getCurrentUserId(): Int {
+        return sharedPreferences.getInt("user_id", -1)
     }
 }

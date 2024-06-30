@@ -21,8 +21,8 @@ interface InventoryDao {
     suspend fun deleteItem(item: InventoryItem)
 
     @Query("SELECT * FROM Inventories WHERE userId = :userId")
-    fun getItems(userId: String): Flow<List<InventoryItem>>
+    fun getItems(userId: Int): Flow<List<InventoryItem>>
 
     @Query("SELECT * FROM Inventories WHERE id = :id AND userId = :userId")
-    suspend fun getItem(id: Int, userId: String): InventoryItem?
+    suspend fun getItem(id: Int, userId: Int): InventoryItem?
 }

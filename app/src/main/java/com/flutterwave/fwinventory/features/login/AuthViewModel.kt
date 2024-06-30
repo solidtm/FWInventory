@@ -20,7 +20,7 @@ class AuthViewModel @Inject constructor(private val authRepository: AuthReposito
         authRepository.logout()
     }
 
-    fun getCurrentUserId(){
-        authRepository.getCurrentUserId()
+    fun getCurrentUserId(): Int{
+        return authRepository.getCurrentUserId()
     }
 }
