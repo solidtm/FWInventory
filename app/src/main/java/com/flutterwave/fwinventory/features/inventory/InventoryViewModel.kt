@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class InventoryViewModel @Inject constructor(
+open class InventoryViewModel @Inject constructor(
     private val inventoryRepository: InventoryRepository,
     private val authRepository: AuthRepository
 ) : ViewModel() {
