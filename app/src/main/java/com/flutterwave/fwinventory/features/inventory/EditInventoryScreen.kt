@@ -26,8 +26,14 @@ fun EditInventoryScreen(
     var totalStock by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
+    var nameError by remember { mutableStateOf(false) }
+    var totalStockError by remember { mutableStateOf(false) }
+    var priceError by remember { mutableStateOf(false) }
+    var descriptionError by remember { mutableStateOf(false) }
+    var uniqueNameError by remember { mutableStateOf(false) }
 
-    LaunchedEffect(inventoryItem) {
+    LaunchedEffect(itemId) {
         scope.launch {
             val item = viewModel.getItem(itemId)
             if (item != null) {
@@ -42,7 +48,17 @@ fun EditInventoryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Edit Inventory Item") })
+            TopAppBar(
+                title = { Text("Edit Inventory Item") },
+                actions = {
+                    Button(
+                        onClick = { showDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Delete Item")
+                    }
+                }
+            )
         },
         content = { paddingValues ->
             Column(
@@ -54,46 +70,91 @@ fun EditInventoryScreen(
             ) {
                 OutlinedTextField(
                     value = name,
-                    onValueChange = { name = it },
+                    onValueChange = {
+                        name = it
+                        nameError = it.isEmpty()
+                        uniqueNameError = viewModel.inventoryItems.value.any { item -> item.name == it && item.id != itemId }
+                    },
                     label = { Text("Item Name") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = nameError || uniqueNameError
                 )
+                if (nameError) {
+                    Text("Name is required", color = MaterialTheme.colorScheme.error)
+                }
+                if (uniqueNameError) {
+                    Text("Name must be unique", color = MaterialTheme.colorScheme.error)
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = totalStock,
-                    onValueChange = { totalStock = it },
+                    onValueChange = {
+                        totalStock = it
+                        totalStockError = it.toIntOrNull() == null
+                    },
                     label = { Text("Total Stock") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = totalStockError
                 )
+                if (totalStockError) {
+                    Text("Total stock must be a number", color = MaterialTheme.colorScheme.error)
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = price,
-                    onValueChange = { price = it },
+                    onValueChange = {
+                        price = it
+                        priceError = it.toDoubleOrNull() == null
+                    },
                     label = { Text("Price") },
                     modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = priceError
                 )
+                if (priceError) {
+                    Text("Price must be a number", color = MaterialTheme.colorScheme.error)
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = description,
-                    onValueChange = { description = it },
+                    onValueChange = {
+                        description = it
+                        descriptionError = it.split(" ").size < 3
+                    },
                     label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = descriptionError
                 )
+                if (descriptionError) {
+                    Text("Description must have at least three words", color = MaterialTheme.colorScheme.error)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        inventoryItem?.let {
-                            viewModel.updateItem(
-                                it.copy(
-                                    name = name,
-                                    totalStock = totalStock.toIntOrNull() ?: 0,
-                                    price = price.toDoubleOrNull() ?: 0.0,
-                                    description = description
+                        val isNameValid = name.isNotEmpty() && viewModel.inventoryItems.value.none { it.name == name && it.id != itemId }
+                        val isTotalStockValid = totalStock.toIntOrNull() != null
+                        val isPriceValid = price.toDoubleOrNull() != null
+                        val isDescriptionValid = description.split(" ").size >= 3
+
+                        if (isNameValid && isTotalStockValid && isPriceValid && isDescriptionValid) {
+                            inventoryItem?.let {
+                                viewModel.updateItem(
+                                    it.copy(
+                                        name = name,
+                                        totalStock = totalStock.toInt(),
+                                        price = price.toDouble(),
+                                        description = description
+                                    )
                                 )
-                            )
-                            navController.popBackStack()
+                                navController.popBackStack()
+                            }
+                        } else {
+                            nameError = !isNameValid
+                            uniqueNameError = !isNameValid && viewModel.inventoryItems.value.any { it.name == name && it.id != itemId }
+                            totalStockError = !isTotalStockValid
+                            priceError = !isPriceValid
+                            descriptionError = !isDescriptionValid
                         }
                     },
                     modifier = Modifier.align(Alignment.End)
@@ -103,4 +164,35 @@ fun EditInventoryScreen(
             }
         }
     )
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Delete Item") },
+            text = { Text("Are you sure you want to delete this item?") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        scope.launch {
+                            inventoryItem?.let {
+                                viewModel.deleteItem(it)
+                                navController.navigate("inventory_list") {
+                                    popUpTo("inventory_list") { inclusive = true }
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Yes")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("No")
+                }
+            }
+        )
+    }
 }
+

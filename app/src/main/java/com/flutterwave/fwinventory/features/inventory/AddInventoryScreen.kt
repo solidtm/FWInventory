@@ -71,7 +71,7 @@ fun AddInventoryScreen(
                     onClick = {
                         viewModel.addItem(
                             InventoryItem(
-                                userId = authViewModel.getCurrentUserId().toString(),
+                                userId = authViewModel.getCurrentUserId(),
                                 name = name,
                                 totalStock = totalStock.toIntOrNull() ?: 0,
                                 price = price.toDoubleOrNull() ?: 0.0,

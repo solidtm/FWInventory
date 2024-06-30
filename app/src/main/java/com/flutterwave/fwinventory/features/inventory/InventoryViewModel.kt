@@ -21,6 +21,7 @@ class InventoryViewModel @Inject constructor(
 
     init {
         val userId = authRepository.getCurrentUserId()
+        println(userId)
         if (userId != null) {
             viewModelScope.launch {
                 inventoryDao.getItems(userId)
