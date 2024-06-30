@@ -1,0 +1,27 @@
+package com.flutterwave.fwinventory.domain
+
+import android.content.SharedPreferences
+import java.util.UUID
+import javax.inject.Inject
+
+class AuthRepository @Inject constructor(private val sharedPreferences: SharedPreferences) {
+
+    fun login(email: String) {
+        val userId = UUID.randomUUID().toString()  // Generate unique user ID
+        sharedPreferences.edit().putString("email", email).apply()
+        sharedPreferences.edit().putString("user_id", userId).apply() // Save user ID
+    }
+
+    fun isLoggedIn(): Boolean {
+        return sharedPreferences.getString("email", null) != null
+    }
+
+    fun logout() {
+        sharedPreferences.edit().remove("email").apply()
+        sharedPreferences.edit().remove("user_id").apply()
+    }
+
+    fun getCurrentUserId(): String? {
+        return sharedPreferences.getString("user_id", null)
+    }
+}
