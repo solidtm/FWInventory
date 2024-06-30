@@ -1,4 +1,4 @@
-package com.flutterwave.fwinventory.data.db
+package com.flutterwave.fwinventory.data.source
 
 import androidx.room.Dao
 import androidx.room.Delete

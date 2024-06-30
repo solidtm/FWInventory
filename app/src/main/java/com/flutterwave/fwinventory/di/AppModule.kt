@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
-import com.flutterwave.fwinventory.data.db.InventoryDao
-import com.flutterwave.fwinventory.data.db.InventoryDatabase
+import com.flutterwave.fwinventory.data.source.InventoryDao
+import com.flutterwave.fwinventory.data.source.InventoryDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

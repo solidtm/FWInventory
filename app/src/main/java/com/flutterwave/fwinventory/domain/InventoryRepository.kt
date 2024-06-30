@@ -1,6 +1,6 @@
 package com.flutterwave.fwinventory.domain
 
-import com.flutterwave.fwinventory.data.db.InventoryDao
+import com.flutterwave.fwinventory.data.source.InventoryDao
 import com.flutterwave.fwinventory.data.model.InventoryItem
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject

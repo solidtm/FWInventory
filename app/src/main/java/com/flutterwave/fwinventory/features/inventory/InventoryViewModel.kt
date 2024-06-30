@@ -2,7 +2,6 @@ package com.flutterwave.fwinventory.features.inventory
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.flutterwave.fwinventory.data.db.InventoryDao
 import com.flutterwave.fwinventory.data.model.InventoryItem
 import com.flutterwave.fwinventory.domain.AuthRepository
 import com.flutterwave.fwinventory.domain.InventoryRepository
