@@ -12,11 +12,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+/**
+ * Dagger module that provides instances for database, DAO, and SharedPreferences.
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    //Database instance
+    /**
+     * Provides a singleton instance of the [InventoryDatabase].
+     *
+     * @param app The application instance.
+     * @return A configured instance of [InventoryDatabase].
+     */
     @Provides
     @Singleton
     fun provideDatabase(app: Application): InventoryDatabase {
@@ -25,13 +33,23 @@ object AppModule {
             .build()
     }
 
-    //Dao instance
+    /**
+     * Provides an instance of the [InventoryDao].
+     *
+     * @param db The [InventoryDatabase] instance.
+     * @return The DAO for accessing inventory data.
+     */
     @Provides
     fun provideInventoryDao(db: InventoryDatabase): InventoryDao {
         return db.inventoryDao()
     }
 
-    //SharedPreferences instance
+    /**
+     * Provides a singleton instance of the [SharedPreferences].
+     *
+     * @param app The application instance.
+     * @return A configured instance of [SharedPreferences].
+     */
     @Provides
     @Singleton
     fun provideSharedPreferences(app: Application): SharedPreferences {

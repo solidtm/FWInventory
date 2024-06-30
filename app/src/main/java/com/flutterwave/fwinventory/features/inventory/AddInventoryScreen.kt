@@ -8,10 +8,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.flutterwave.fwinventory.R
 import com.flutterwave.fwinventory.data.model.InventoryItem
 import com.flutterwave.fwinventory.features.login.AuthViewModel
 import kotlinx.coroutines.launch
@@ -37,12 +39,12 @@ fun AddInventoryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Add Inventory Item") },
+            TopAppBar(title = { Text(stringResource(id = R.string.add_inventory_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(id = R.string.back)
                         )
                     }
                 }
@@ -56,67 +58,39 @@ fun AddInventoryScreen(
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it; nameError = null },
-                    label = { Text("Item Name") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = nameError != null
+                OutlinedTextFieldWithError(
+                    value = mutableStateOf(name),
+                    onValueChange = { name = it },
+                    label = stringResource(id = R.string.item_name),
+                    isError = nameError != null,
+                    errorMessage = nameError,
                 )
-                if (nameError != null) {
-                    Text(
-                        text = nameError!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = totalStock,
-                    onValueChange = { totalStock = it; totalStockError = null },
-                    label = { Text("Total Stock") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = totalStockError != null
+                OutlinedTextFieldWithError(
+                    value = mutableStateOf(totalStock),
+                    onValueChange = { totalStock = it },
+                    label = stringResource(id = R.string.total_stock),
+                    isError = totalStockError != null,
+                    errorMessage = totalStockError,
+                    keyboardType = KeyboardType.Number
                 )
-                if (totalStockError != null) {
-                    Text(
-                        text = totalStockError!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = price,
-                    onValueChange = { price = it; priceError = null },
-                    label = { Text("Price") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = priceError != null
+                OutlinedTextFieldWithError(
+                    value = mutableStateOf(price),
+                    onValueChange = { price = it },
+                    label = stringResource(id = R.string.price),
+                    isError = priceError != null,
+                    errorMessage = priceError,
+                    keyboardType = KeyboardType.Number
                 )
-                if (priceError != null) {
-                    Text(
-                        text = priceError!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it; descriptionError = null },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = descriptionError != null
+                OutlinedTextFieldWithError(
+                    value = mutableStateOf(description),
+                    onValueChange = { description = it },
+                    label = stringResource(id = R.string.description),
+                    isError = descriptionError != null,
+                    errorMessage = descriptionError
                 )
-                if (descriptionError != null) {
-                    Text(
-                        text = descriptionError!!,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
@@ -163,11 +137,42 @@ fun AddInventoryScreen(
                     },
                     modifier = Modifier.align(Alignment.End)
                 ) {
-                    Text("Add Item")
+                    Text(stringResource(id = R.string.add_item))
                 }
             }
         }
     )
+}
+
+
+@Composable
+fun OutlinedTextFieldWithError(
+    value: MutableState<String>,
+    onValueChange: (String) -> Unit,
+    label: String,
+    isError: Boolean,
+    errorMessage: String?,
+    keyboardType: KeyboardType = KeyboardType.Text,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value.value,
+            onValueChange = { onValueChange(it); value.value = it },
+            label = { Text(label) },
+            isError = isError,
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            modifier = modifier.fillMaxWidth()
+        )
+        errorMessage?.let {
+            Text(
+                text = errorMessage,
+                modifier = Modifier.padding(start = 4.dp),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
+    }
 }
 
 
