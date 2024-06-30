@@ -1,4 +1,4 @@
-package com.flutterwave.fwinventory.ui.theme
+package com.flutterwave.fwinventory.features.theme
 
 import androidx.compose.ui.graphics.Color
 
