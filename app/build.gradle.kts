@@ -52,6 +52,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             merges += "/META-INF/gradle/incremental.annotation.processors"
         }
+        jniLibs {
+            useLegacyPackaging = true
+        }
     }
     testOptions {
         unitTests.isIncludeAndroidResources = true
@@ -69,41 +72,41 @@ android {
 
 dependencies {
 
-    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.ui.test.junit4.android)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-
-    implementation(libs.hilt.android)
-    implementation(libs.hilt.compiler)
-    ksp(libs.hilt.android.compiler)
-    implementation(libs.hilt.navigation.compose)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.android)
-
-    implementation(libs.room.runtime)
-    implementation(libs.room.ktx)
-    ksp(libs.room.compiler)
     implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.hilt.navigation.compose)
+    implementation(libs.androidx.ui.graphics)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.hilt.compiler)
+    implementation(libs.room.runtime)
+    implementation(libs.hilt.android)
+    implementation(libs.androidx.ui)
+    implementation(libs.room.ktx)
+    implementation(libs.firebase.firestore.ktx)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.room.compiler)
 
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.jupiter.engine)
-    androidTestImplementation(libs.compose.ui.test)
+
+//    Testing
+    testImplementation("junit:junit:4.12")
+    testImplementation("io.mockk:mockk:1.12.0")
+    androidTestImplementation("io.mockk:mockk-android:1.12.0")
+    androidTestImplementation("com.google.truth:truth:0.43")
+    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.test.core)
     androidTestImplementation(libs.test.runner)
     androidTestImplementation(libs.test.rules)
     androidTestImplementation(libs.test.ext.junit)
-    androidTestImplementation(libs.room.testing)
 
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     kspAndroidTest(libs.hilt.android.compiler)

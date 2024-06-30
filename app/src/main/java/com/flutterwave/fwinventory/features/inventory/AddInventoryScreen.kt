@@ -2,6 +2,8 @@ package com.flutterwave.fwinventory.features.inventory
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -35,7 +37,16 @@ fun AddInventoryScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Add Inventory Item") })
+            TopAppBar(title = { Text("Add Inventory Item") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                }
+            )
         },
         content = { paddingValues ->
             Column(
